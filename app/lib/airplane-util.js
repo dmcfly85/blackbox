@@ -2,21 +2,24 @@ import inside from 'point-in-polygon';
 import _ from 'lodash';
 import constants from '../config/constants';
 
+const viewaArea = constants.visualHorizonPolygon;
+const polygon = [
+    viewaArea.origin,
+    // viewaArea.leftNear,
+    viewaArea.lettFar,
+    // viewaArea.rightNear,
+    viewaArea.rightFar,  
+  ]
+
 const AirplaneUtil = {
 
-  isValid: function isValid (airplanes){
-   let validAirplanes = airplanes
-   
-   return validAirplanes;
- },
-
  valid: function inView (airplanes){
-    let airplanesInView = _.find(airplanes, {validtrack:1}) 
+    let airplanesInView = _.filter(airplanes, {validtrack:1}) 
     return(airplanesInView) 
  },
 
  withDirections: function directionToLook (airplanes) {
-    let airplanesInView = _.find(airplanes, {validtrack:1})
+    let airplanesInView = _.filter(airplanes, {validtrack:1})
      airplanesInView = _calculateDistance(airplanesInView)
     return(airplanesInView) 
  }
@@ -25,26 +28,39 @@ const AirplaneUtil = {
 
 function _calculateDistance (airplanes){
     let returnObject = []
-  _.each(airplanes, function(plane) {
-      console.log(plane)
-      let o = constants.visualHorizonPolygon.origin
-      let p = [plane.lat, plane.lon]
+  
+      _.each(airplanes, function(plane) {
+        var lat1 = constants.visualHorizonPolygon.origin[0]
+        var lat2 = plane.lat
+        var lon1 = constants.visualHorizonPolygon.origin[1]
+        var lon2 =  plane.lon
 
-       //plan.distance = Math.sqrt(Math.pow(o[0] - p[0], 2) + Math.pow(o[1] - p[1],2))
-//         visualHorizonPolygon: {
-//     origin: [47.638418,-122.32635],
-//     leftNear: [47.61163,-122.344437],
-//     lettFar:  [47.588213,-122.450867],
-//     rightNear: [47.65105,-122.347355],
-//     rightFar: [47.700628,-122.451553],
-//   },
-      //lat":46.900909,"lon":-122.722504
-    // (x2-x1)^2 + (y2-y1)^2
-    console.log(plane)
-    returnObject.push(plane)
+        //Radius of the earth in:  1.609344 miles,  6371 km  | var R = (6371 / 1.609344);
+        var R = 3958.7558657440545; // Radius of earth in Miles
+        var dLat = _toRad(lat2-lat1);
+        var dLon = _toRad(lon2-lon1); 
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(_toRad(lat1)) * Math.cos(_toRad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+        
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        var d = R * c;
+        plane.distance = d.toFixed(2)
+
+        plane.inViewArea = inside([plane.lat, plane.lon],polygon)
+        console.log("inside",inside([47.638934,-122.374134],polygon))
+        console.log(plane.inViewArea)
+
+      returnObject.push(plane)
   })
   return returnObject;
 }
+
+function _toRad(Value) {
+    /** Converts numeric degrees to radians */
+    return Value * Math.PI / 180;
+}
+
 
 
 export default AirplaneUtil;

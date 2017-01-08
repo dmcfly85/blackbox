@@ -6,11 +6,9 @@ import errorHandler from 'errorhandler';
 import morgan from 'morgan';
 import helmet from 'helmet';
 
-import getDump from './lib/get-dump'
-
+import dumpService from './lib/dump-service'
 import routes from './routes';
 import Constants from './config/constants';
-//import './database';
 
 let app = express();
 
@@ -47,14 +45,17 @@ app.listen(Constants.port, () => {
 });
 
 
-// a self fulfilling promise 
-function updateDump () {
-  getDump('http://piaware.local:8080/dump1090/data.json').then(function(r){
-    console.log(JSON.parse(r))
-    updateDump ()
-  })  
-}
+dumpService.startService()
 
+
+// function timpedloop () {
+//   setTimeout(function () {
+//   console.log(dumpService.data.length)
+//   timpedloop ()
+// }, 2000);
+// }
+
+// timpedloop ()
 
 //updateDump()
 export default app;

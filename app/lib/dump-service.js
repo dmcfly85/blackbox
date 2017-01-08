@@ -1,4 +1,14 @@
-const getDump = function(url) {
+import constants from '../config/constants';
+const dumpService = {}
+
+dumpService.startService = function startDump (){
+    this.getDump(constants.dumpUrl).then(function(response){
+    dumpService.data = (JSON.parse(response))
+    dumpService.startService()
+  })  
+}
+
+dumpService.getDump = function getDumo (url) {
   // return new pending promise
   return new Promise((resolve, reject) => {
     // select http or https module, depending on reqested url
@@ -20,4 +30,6 @@ const getDump = function(url) {
     })
 };
 
-export default getDump;
+dumpService.data = {}
+
+export default dumpService;

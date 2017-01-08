@@ -20,6 +20,8 @@ const defaultConfig = {
     rightFar: [47.700628,-122.451553],
   },
 
+  dumpUrl: "http://10.0.1.33:8080/dump1090/data.json",
+
   version: require('../../package.json').version,
   root: path.normalize(__dirname + '/../../..'),
   port: process.env.PORT || 3000,
