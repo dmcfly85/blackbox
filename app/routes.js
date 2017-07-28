@@ -6,7 +6,6 @@ const routes = new Router();
 const prefix = constants.apiPrefix;
 
 routes.get(`/airplanes/all`, AirplaneController.all);
-routes.get(`/airplanes/with_directions`, AirplaneController.withDirections);
-routes.get(`/airplanes/raw`, AirplaneController.raw);
+//routes.get(`/airplanes/raw`, AirplaneController.raw)
 
 export default routes;

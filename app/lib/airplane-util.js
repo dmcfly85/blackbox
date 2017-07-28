@@ -6,6 +6,7 @@ module.exports = function (config) {
 
   const viewAreaPoints = config.visualHorizonPolygon;
 
+  // viewAreaPolygons is created by slicing a triangle in two five triangles each sharing a single point
   let viewAreaPolygons = {
 
     entire: [
@@ -45,12 +46,6 @@ module.exports = function (config) {
     ]
   };
 
-
-  function inView (airplanes){
-    let airplanesInView = _.filter(airplanes, {validtrack:1});
-    return(airplanesInView);
-  };
-
   function directionToLook (airplane) {
 
     if(inside([airplane.lat, airplane.lon], viewAreaPolygons.leftFar)) {
@@ -76,7 +71,17 @@ module.exports = function (config) {
     return -1;
   };
 
-  function calculateDistance (pointA, pointB ){
+  function processAirplanes (airplanes) {
+    let results = [];
+    airplanes.forEach((plane) => {
+      plane.distance = calculateDistance([plane.lat, plane.log], viewAreaPoints.origin);
+      plane.directionToLook = directionToLook(plane);
+    })
+
+    return results;
+  }
+
+  function calculateDistance (pointA, pointB ) {
     let lat1 = pointA[0];
     let lat2 = pointB[0];
     let lon1 = pointA[1];
@@ -108,7 +113,7 @@ module.exports = function (config) {
   }
 
   return {
-    inView,
+    processAirplanes,
     directionToLook,
     calculateDistance,
     findPointOnLine,

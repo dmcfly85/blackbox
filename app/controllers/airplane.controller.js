@@ -9,16 +9,16 @@ class AirplaneController extends BaseController {
   }
 
   all(req, res){
-    res.json(airplaneUtil.valid(dumpService.data));
+    res.json(airplaneUtil.abc(dumpService.data));
   }
 
   raw(req, res){
     res.json(dumpService.data);
   }
 
-  withDirections(req, res){
-    res.json(airplaneUtil.withDirections(dumpService.data));
-  }
+  //processAirplanes(req, res){
+    //res.json(airplaneUtil.processAirplanes(dumpService.data));
+  //}
 }
 
 
