@@ -8,18 +8,17 @@ class AirplaneController extends BaseController {
     this.all = this.all.bind(this);
   }
 
-  all(req,res){
-      res.json(airplaneUtil.valid(dumpService.data))
+  all(req, res){
+    res.json(airplaneUtil.valid(dumpService.data));
   }
 
-    raw(req,res){
-      res.json(dumpService.data)
+  raw(req, res){
+    res.json(dumpService.data);
   }
 
-  withDirections(req,res){
-      res.json(airplaneUtil.withDirections(dumpService.data))
+  withDirections(req, res){
+    res.json(airplaneUtil.withDirections(dumpService.data));
   }
-
 }
 
 

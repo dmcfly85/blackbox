@@ -13,18 +13,16 @@ const defaultConfig = {
   },
 
   visualHorizonPolygon: {
-    origin: [47.638418,-122.32635],
-    leftNear: [47.61163,-122.344437],
-    lettFar:  [47.588213,-122.450867],
-    rightNear: [47.65105,-122.347355],
-    rightFar: [47.700628,-122.451553],
+    origin: [47.638418, -122.32635],
+    lettFar:  [47.588213, -122.450867],
+    rightFar: [47.700628, -122.451553],
   },
 
-  dumpUrl: "http://10.0.1.33:8080/dump1090/data.json",
+  dumpUrl: "http://piaware.local:8080/dump1090/data.json",
 
   version: require('../../package.json').version,
   root: path.normalize(__dirname + '/../../..'),
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 3030,
   ip: process.env.IP || '0.0.0.0',
   apiPrefix: '', // Could be /api/resource or /api/v2/resource
   //userRoles: ['guest', 'user', 'admin'],

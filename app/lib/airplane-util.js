@@ -1,66 +1,117 @@
 import inside from 'point-in-polygon';
 import _ from 'lodash';
-import constants from '../config/constants';
+//import constants from '../config/constants';
 
-const viewaArea = constants.visualHorizonPolygon;
-const polygon = [
-    viewaArea.origin,
-    // viewaArea.leftNear,
-    viewaArea.lettFar,
-    // viewaArea.rightNear,
-    viewaArea.rightFar,  
-  ]
+module.exports = function (config) {
 
-const AirplaneUtil = {
+  const viewAreaPoints = config.visualHorizonPolygon;
 
- valid: function inView (airplanes){
-    let airplanesInView = _.filter(airplanes, {validtrack:1}) 
-    return(airplanesInView) 
- },
+  let viewAreaPolygons = {
 
- withDirections: function directionToLook (airplanes) {
-    let airplanesInView = _.filter(airplanes, {validtrack:1})
-     airplanesInView = _calculateDistance(airplanesInView)
-    return(airplanesInView) 
- }
-}
+    entire: [
+      viewAreaPoints.origin,
+      viewAreaPoints.leftFar,
+      viewAreaPoints.rightFar,
+    ],
+
+    leftFar:  [
+      viewAreaPoints.origin,
+      viewAreaPoints.leftFar,
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .2)
+    ],
+
+    leftCenter: [
+      viewAreaPoints.origin,
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .2),
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .4)
+    ],
+
+    center:[
+      viewAreaPoints.origin,
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .4),
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .6)
+    ],
+
+    rightCenter:  [
+      viewAreaPoints.origin,
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .6),
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .8)
+    ],
+
+    right: [
+      viewAreaPoints.origin,
+      findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .8),
+      viewAreaPoints.rightFar,
+    ]
+  };
 
 
-function _calculateDistance (airplanes){
-    let returnObject = []
-  
-      _.each(airplanes, function(plane) {
-        var lat1 = constants.visualHorizonPolygon.origin[0]
-        var lat2 = plane.lat
-        var lon1 = constants.visualHorizonPolygon.origin[1]
-        var lon2 =  plane.lon
+  function inView (airplanes){
+    let airplanesInView = _.filter(airplanes, {validtrack:1});
+    return(airplanesInView);
+  };
 
-        //Radius of the earth in:  1.609344 miles,  6371 km  | var R = (6371 / 1.609344);
-        var R = 3958.7558657440545; // Radius of earth in Miles
-        var dLat = _toRad(lat2-lat1);
-        var dLon = _toRad(lon2-lon1); 
-        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(_toRad(lat1)) * Math.cos(_toRad(lat2)) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2); 
-        
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c;
-        plane.distance = d.toFixed(2)
+  function directionToLook (airplane) {
 
-        plane.inViewArea = inside([plane.lat, plane.lon],polygon)
-        console.log("inside",inside([47.638934,-122.374134],polygon))
-        console.log(plane.inViewArea)
+    if(inside([airplane.lat, airplane.lon], viewAreaPolygons.leftFar)) {
+      return .10;
+    };
 
-      returnObject.push(plane)
-  })
-  return returnObject;
-}
+    if(inside([airplane.lat, airplane.lon], viewAreaPolygons.leftCenter)) {
+      return .30;
+    };
 
-function _toRad(Value) {
+    if(inside([airplane.lat, airplane.lon], viewAreaPolygons.center)) {
+      return .50;
+    };
+
+    if(inside([airplane.lat, airplane.lon], viewAreaPolygons.rightCenter)) {
+      return .70;
+    };
+
+    if(inside([airplane.lat, airplane.lon], viewAreaPolygons.right)) {
+      return .90;
+    };
+
+    return -1;
+  };
+
+  function calculateDistance (pointA, pointB ){
+    let lat1 = pointA[0];
+    let lat2 = pointB[0];
+    let lon1 = pointA[1];
+    let lon2 = pointB[1];
+
+    //Radius of the earth in:  1.609344 miles,  6371 km  | let R = (6371 / 1.609344);
+    let R = 3958.7558657440545; // Radius of earth in Miles
+    let dLat = toRadians(lat2 - lat1);
+    let dLon = toRadians(lon2 - lon1);
+    let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    let d = R * c;
+
+    return d.toFixed(2) / 1;
+  }
+
+  function findPointOnLine (pointA, pointB, percent) {
+    let x = (pointA[0] * (1 - percent)) + (pointB[0] * percent);
+    let y = (pointA[1] * (1 - percent)) + (pointB[1] * percent);
+    return [x, y];
+  }
+
+  function toRadians(Value) {
     /** Converts numeric degrees to radians */
     return Value * Math.PI / 180;
+  }
+
+  return {
+    inView,
+    directionToLook,
+    calculateDistance,
+    findPointOnLine,
+  };
+
 }
-
-
-
-export default AirplaneUtil;
