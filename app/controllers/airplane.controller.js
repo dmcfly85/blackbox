@@ -1,6 +1,8 @@
 import BaseController from './base.controller';
 import dumpService from '../lib/dump-service';
-import airplaneUtil from '../lib/airplane-util';
+import apu from '../lib/airplane-util';
+
+airplaneUtil = apu(config)
 
 class AirplaneController extends BaseController {
   constructor() {
@@ -9,7 +11,7 @@ class AirplaneController extends BaseController {
   }
 
   all(req, res){
-    res.json(airplaneUtil.abc(dumpService.data));
+    res.json(airplaneUtil.processAirplanes(dumpService.data));
   }
 
   raw(req, res){

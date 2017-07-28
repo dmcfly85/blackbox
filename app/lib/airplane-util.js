@@ -6,7 +6,8 @@ module.exports = function (config) {
 
   const viewAreaPoints = config.visualHorizonPolygon;
 
-  // viewAreaPolygons is created by slicing a triangle in two five triangles each sharing a single point
+  // viewAreaPolygons is created by slicing a triangle in to five triangles 
+  // each of the five triangles share the origin point as one of their own points
   let viewAreaPolygons = {
 
     entire: [
