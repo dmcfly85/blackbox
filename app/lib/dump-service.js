@@ -1,6 +1,7 @@
 import constants from '../config/constants';
 const dumpService = {}
 
+//TODO will break on fail, maybe a timeout
 dumpService.startService = function startDump (){
     this.getDump(constants.dumpUrl).then(function(response){
     dumpService.data = (JSON.parse(response))
@@ -23,7 +24,11 @@ dumpService.getDump = function getDumo (url) {
       // on every content chunk, push it to the data array
       response.on('data', (chunk) => body.push(chunk));
       // we are done, resolve promise with those joined chunks
-      response.on('end', () => resolve(body.join('')));
+      response.on('end', () => {
+        console.log(body.join(''))
+
+        resolve(body.join(''))
+      })
     });
     // handle connection errors of the request
     request.on('error', (err) => reject(err))
