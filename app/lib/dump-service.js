@@ -1,15 +1,15 @@
-import constants from '../config/constants';
+import config from '../config/config';
 const dumpService = {}
 
 //TODO will break on fail, maybe a timeout
 dumpService.startService = function startDump (){
-    this.getDump(constants.dumpUrl).then(function(response){
+    this.getDump(config.dumpUrl).then(function(response){
     dumpService.data = (JSON.parse(response))
     dumpService.startService()
   })  
 }
 
-dumpService.getDump = function getDumo (url) {
+dumpService.getDump = function getDump (url) {
   // return new pending promise
   return new Promise((resolve, reject) => {
     // select http or https module, depending on reqested url

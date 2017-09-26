@@ -1,50 +1,50 @@
 import inside from 'point-in-polygon';
-import _ from 'lodash';
-import config from '../config/config.js';
 
+module.exports = function (config) {
 
-const viewAreaPoints = config.visualHorizonPolygon;
+  let viewAreaPolygons = {};
 
+  function buildViewAreaPolygons (viewAreaPoints) {
   // viewAreaPolygons is created by slicing a triangle in to five triangles 
   // each of the five triangles share the origin point as one of their own points
-let viewAreaPolygons = {
+    return {
+      entire: [
+        viewAreaPoints.origin,
+        viewAreaPoints.leftFar,
+        viewAreaPoints.rightFar,
+      ],
 
-  entire: [
-    viewAreaPoints.origin,
-    viewAreaPoints.leftFar,
-    viewAreaPoints.rightFar,
-  ],
+      leftFar:  [
+        viewAreaPoints.origin,
+        viewAreaPoints.leftFar,
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .2)
+      ],
 
-  leftFar:  [
-    viewAreaPoints.origin,
-    viewAreaPoints.leftFar,
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .2)
-  ],
+      leftCenter: [
+        viewAreaPoints.origin,
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .2),
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .4)
+      ],
 
-  leftCenter: [
-    viewAreaPoints.origin,
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .2),
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .4)
-  ],
+      center:[
+        viewAreaPoints.origin,
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .4),
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .6)
+      ],
 
-  center:[
-    viewAreaPoints.origin,
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .4),
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .6)
-  ],
+      rightCenter:  [
+        viewAreaPoints.origin,
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .6),
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .8)
+      ],
 
-  rightCenter:  [
-    viewAreaPoints.origin,
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .6),
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .8)
-  ],
-
-  right: [
-    viewAreaPoints.origin,
-    findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .8),
-    viewAreaPoints.rightFar,
-  ]
-};
+      right: [
+        viewAreaPoints.origin,
+        findPointOnLine(viewAreaPoints.leftFar, viewAreaPoints.rightFar, .8),
+        viewAreaPoints.rightFar,
+      ]
+    };
+  };
 
 
   function directionToLook (airplane) {
@@ -73,10 +73,9 @@ let viewAreaPolygons = {
   };
 
   function processAirplanes (airplanes) {
-    console.log(airplanes)
     let results = [];
     airplanes.forEach((plane) => {
-      plane.distance = calculateDistance([plane.lat, plane.log], viewAreaPoints.origin);
+      plane.distance = calculateDistance([plane.lat, plane.log], config.visualHorizonPolygon.origin);
       plane.directionToLook = directionToLook(plane);
     })
 
@@ -114,10 +113,20 @@ let viewAreaPolygons = {
     return Value * Math.PI / 180;
   }
 
-module.exports = {
-    processAirplanes,
-    directionToLook,
+  function init () {
+    viewAreaPolygons = buildViewAreaPolygons(config.visualHorizonPolygon);
+  }
+
+  init();
+
+
+  return {
+    buildViewAreaPolygons,
     calculateDistance,
+    directionToLook,
     findPointOnLine,
+    processAirplanes,
   };
+
+}
 
