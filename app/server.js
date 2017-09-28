@@ -5,12 +5,15 @@ import methodOverride from 'method-override';
 import errorHandler from 'errorhandler';
 import morgan from 'morgan';
 import helmet from 'helmet';
-
 import dumpService from './lib/dump-service'
-import routes from './routes';
+import _routes_ from './routes';
 import Constants from './config/constants';
+import config from './config/config.js'
+
+let routes = _routes_(config)
 
 let app = express();
+
 
 // Adds some security best practices
 app.use(helmet());
@@ -44,8 +47,7 @@ app.listen(Constants.port, () => {
   `);
 });
 
-
-dumpService.startService()
+dumpService.startService(config)
 
 
 // function timpedloop () {

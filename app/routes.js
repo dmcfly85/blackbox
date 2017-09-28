@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import AirplaneController from './controllers/airplane.controller';
-import constants from './config/constants';
 
-const routes = new Router();
-const prefix = constants.apiPrefix;
+function router (config) {
 
-routes.get(`/airplanes/all`, AirplaneController.all);
-//routes.get(`/airplanes/raw`, AirplaneController.raw)
+  const airplaneController = new AirplaneController(config);
+  const routes = new Router();
+  routes.get('/airplanes/all', airplaneController.all);
+  return routes;
+}
 
-export default routes;
+export default router;

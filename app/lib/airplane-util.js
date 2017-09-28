@@ -73,20 +73,23 @@ module.exports = function (config) {
   };
 
   function processAirplanes (airplanes) {
-    let results = [];
-    airplanes.forEach((plane) => {
-      plane.distance = calculateDistance([plane.lat, plane.log], config.visualHorizonPolygon.origin);
-      plane.directionToLook = directionToLook(plane);
-    })
-
-    return results;
+    if (airplanes.length) {
+      return airplanes.filter((plane) => {
+        if (plane.validtrack > 0) {
+          plane.distance = calculateDistance([plane.lat, plane.lon], config.visualHorizonPolygon.origin);
+          plane.directionToLook = directionToLook(plane);
+          return plane;
+        };
+      });
+    }
+    return [];
   }
 
   function calculateDistance (pointA, pointB ) {
-    let lat1 = pointA[0];
-    let lat2 = pointB[0];
-    let lon1 = pointA[1];
-    let lon2 = pointB[1];
+    let lat1 = parseFloat(pointA[0]);
+    let lat2 = parseFloat(pointB[0]);
+    let lon1 = parseFloat(pointA[1]);
+    let lon2 = parseFloat(pointB[1]);
 
     //Radius of the earth in:  1.609344 miles,  6371 km  | let R = (6371 / 1.609344);
     let R = 3958.7558657440545; // Radius of earth in Miles
@@ -108,9 +111,8 @@ module.exports = function (config) {
     return [x, y];
   }
 
-  function toRadians(Value) {
-    /** Converts numeric degrees to radians */
-    return Value * Math.PI / 180;
+  function toRadians(value) {
+    return value * Math.PI / 180;
   }
 
   function init () {
@@ -118,7 +120,6 @@ module.exports = function (config) {
   }
 
   init();
-
 
   return {
     buildViewAreaPolygons,
