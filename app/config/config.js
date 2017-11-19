@@ -6,6 +6,7 @@ module.exports = {
     rightFar: [47.700628, -122.451553],
   },
 
+  seenTolerance: 15,
   dumpUrl: 'http://piaware.local:8080/dump1090/data.json'
 
 };

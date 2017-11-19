@@ -75,7 +75,7 @@ module.exports = function (config) {
   function processAirplanes (airplanes) {
     if (airplanes.length) {
       return airplanes.filter((plane) => {
-        if (plane.validtrack > 0) {
+        if (plane.validtrack > 0 && plane.seen < config.seenTolerance && plane.validtrack > 0) {
           plane.distance = calculateDistance([plane.lat, plane.lon], config.visualHorizonPolygon.origin);
           plane.directionToLook = directionToLook(plane);
           return plane;
